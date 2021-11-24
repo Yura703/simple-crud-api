@@ -3,10 +3,20 @@ const { CreatePersonError } = require("./error/errors");
 
 module.exports = class Person {
   constructor(person) {
+    this.#checkPerson(person);
     this.id = uuidv4();
     this.name = this.#checkName(person.name);
     this.age = this.#checkAge(person.age);
     this.hobbies = this.#checkHobbies(person.hobbies);
+  }
+
+  #checkPerson(person) {
+    if (!person.name)
+      throw new CreatePersonError("'Person' does not contain 'name 'field");
+    if (!person.age)
+      throw new CreatePersonError("'Person' does not contain 'age' field");
+    if (!person.hobbies)
+      throw new CreatePersonError("'Person' does not contain 'hobbies' field");
   }
 
   #checkAge(age) {

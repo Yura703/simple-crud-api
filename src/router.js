@@ -5,7 +5,7 @@ const { NotFoundRecordError } = require("./error/errors");
 async function get(url, response) {
   try {
     let responseValue = "";
-    const id = parseURL(url);
+    const id = _parseURL(url);
     if (!id) {
       responseValue = await RepositoryPersons.findAll();
     } else {
@@ -20,7 +20,7 @@ async function get(url, response) {
 
 async function post(request, response) {
   try {
-    if (parseURL(request.url)) {
+    if (_parseURL(request.url)) {
       throw new NotFoundRecordError(`Resource POST: ${url} does not exist`);
     }
 
@@ -39,7 +39,7 @@ async function post(request, response) {
 
 async function put(request, response) {
   try {
-    const id = parseURL(request.url);
+    const id = _parseURL(request.url);
 
     if (!id) {
       throw new NotFoundRecordError(`Resource PUT: ${url} does not exist`);
@@ -60,7 +60,7 @@ async function put(request, response) {
 
 async function remove(url, response) {
   try {
-    const id = parseURL(url);
+    const id = _parseURL(url);
     if (id) {
       await RepositoryPersons.deletePerson(id);
 
@@ -74,7 +74,7 @@ async function remove(url, response) {
   }
 }
 
-function parseURL(url) {
+function _parseURL(url) {
   if (url === "/person") {
     return false;
   } else if (url.indexOf("/person/") === 0) {
@@ -105,7 +105,7 @@ function _catch(error, response) {
       break;
   }
 
-  response.end(JSON.stringify(error.message));
+  response.end(error.message);
 }
 
 module.exports = {
