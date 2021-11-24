@@ -5,86 +5,107 @@ const { NotFoundRecordError } = require("./error/errors");
 async function get(url, response) {
   try {
     let responseValue = "";
-    if (url === "/person") {
+    const id = parseURL(url);
+    if (!id) {
       responseValue = await RepositoryPersons.findAll();
-    } else if (url.indexOf("/person/") === 0) {
-      const id = url.replace("/person/", "");
-
-      responseValue = await RepositoryPersons.findById(id);
     } else {
-      throw new NotFoundRecordError(`Resource ${url} does not exist`);
+      responseValue = await RepositoryPersons.findById(id);
     }
-
     response.statusCode = 200;
     response.end(JSON.stringify(responseValue));
   } catch (error) {
-    switch (error.name) {
-      case "BadRequestError":
-        response.statusCode = 400;
-        break;
-
-      case "CreatePersonError":
-        response.statusCode = 400;
-        break;
-
-      case "NotFoundRecordError":
-        response.statusCode = 404;
-        break;
-
-      default:
-        response.statusCode = 500;
-        break;
-    }
-
-    response.end(JSON.stringify(error.message));
+    _catch(error, response);
   }
 }
 
 async function post(request, response) {
   try {
-    //строка должна быть /person
+    if (parseURL(request.url)) {
+      throw new NotFoundRecordError(`Resource POST: ${url} does not exist`);
+    }
+
     let person = {};
     const chunks = [];
     await request.on("data", (chunk) => chunks.push(chunk));
-    request.on("end", () => {
-      person = RepositoryPersons.createPerson(JSON.parse(chunks));
 
-      response.statusCode = 201;
-      response.end(JSON.stringify(person));
-    });
-  } catch (e) {
-    res.statusCode = 500;
-    res.end(JSON.stringify(e));
-    return e;
+    person = RepositoryPersons.createPerson(JSON.parse(chunks));
+
+    response.statusCode = 201;
+    response.end(JSON.stringify(person));
+  } catch (error) {
+    _catch(error, response);
   }
 }
 
-async function put(request, response) {}
+async function put(request, response) {
+  try {
+    const id = parseURL(request.url);
+
+    if (!id) {
+      throw new NotFoundRecordError(`Resource PUT: ${url} does not exist`);
+    }
+
+    let person = {};
+    const chunks = [];
+    await request.on("data", (chunk) => chunks.push(chunk));
+
+    person = RepositoryPersons.editPerson(id, JSON.parse(chunks));
+
+    response.statusCode = 200;
+    response.end(JSON.stringify(person));
+  } catch (error) {
+    _catch(error, response);
+  }
+}
 
 async function remove(url, response) {
-  if (url.indexOf("/person/") === 0) {
-    const id = url.replace("/person/", "");
+  try {
+    const id = parseURL(url);
+    if (id) {
+      await RepositoryPersons.deletePerson(id);
 
-    await RepositoryPersons.remove(id);
-
-    response.statusCode = 204;
-    response.end();
-  } else {
-    throw new NotFoundRecordError(`Resource ${url} does not exist`);
+      response.statusCode = 204;
+      response.end();
+    } else {
+      throw new NotFoundRecordError("Missing ID to delete");
+    }
+  } catch (error) {
+    _catch(error, response);
   }
 }
 
 function parseURL(url) {
   if (url === "/person") {
-
     return false;
   } else if (url.indexOf("/person/") === 0) {
     const id = url.replace("/person/", "");
 
     return id;
   } else {
-
     throw new NotFoundRecordError(`Resource ${url} does not exist`);
+  }
+}
+
+function _catch(error, response) {
+  switch (error.name) {
+    case "BadRequestError":
+      response.statusCode = 400;
+      break;
+
+    case "CreatePersonError":
+      response.statusCode = 400;
+      break;
+
+    case "NotFoundRecordError":
+      response.statusCode = 404;
+      break;
+
+    default:
+      response.statusCode = 500;
+      break;
+  }
+
+  response.end(JSON.stringify(error.message));
 }
 
 module.exports = {

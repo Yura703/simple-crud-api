@@ -1,6 +1,7 @@
 const uuid = require("uuid");
-const Person = require("./person");
+const Person = require("./Person");
 const { NotFoundRecordError, BadRequestError } = require("./error/errors");
+const { CreatePersonError } = require("./error/errors");
 
 const ITEM_NOT_FOUND = -1;
 
@@ -11,7 +12,7 @@ class RepositoryPersons {
 
   //get
   findById(id) {
-    index = this.checkId(id);
+    const index = this.checkId(id);
 
     return this.arrayPerson[index];
   }
@@ -24,20 +25,22 @@ class RepositoryPersons {
   createPerson(pers) {
     const person = new Person(pers);
     this.arrayPerson.push(person);
+
     return person;
   }
 
   //put
-  editPerson(id, person) {
-    index = this.checkId(id);
+  editPerson(id, pers) {
+    const index = this.checkId(id);
+    const person = this.createPerson(pers);
     person.id = id;
-    arrayPerson[index] = person;
+    this.arrayPerson[index] = person;
     return person;
   }
 
   //delete
   deletePerson(id) {
-    index = this.checkId(id);
+    const index = this.checkId(id);
     this.arrayPerson.splice(index, 1);
     return true;
   }
