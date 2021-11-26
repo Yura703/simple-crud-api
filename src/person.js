@@ -12,7 +12,7 @@ module.exports = class Person {
 
   #checkPerson(person) {
     if (!person.name)
-      throw new CreatePersonError("'Person' does not contain 'name 'field");
+      throw new CreatePersonError("'Person' does not contain 'name'field");
     if (!person.age)
       throw new CreatePersonError("'Person' does not contain 'age' field");
     if (!person.hobbies)

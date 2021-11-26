@@ -6,7 +6,7 @@ async function get(url, response) {
   try {
     let responseValue = "";
     const id = _parseURL(url);
-    if (!id) {
+    if (!id && id !== "") {
       responseValue = await RepositoryPersons.findAll();
     } else {
       responseValue = await RepositoryPersons.findById(id);
