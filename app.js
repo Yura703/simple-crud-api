@@ -1,5 +1,4 @@
 const http = require("http");
-//require("dotenv").config();
 const router = require("./src/router");
 
 const server = http.createServer(function (request, response) {
@@ -33,15 +32,5 @@ const server = http.createServer(function (request, response) {
     response.end("Something went wrong: " + error.message);
   }
 });
-
-// const port = process.env.PORT || 4000; //сделать разные порты
-
-// server.listen(port, function (error) {
-//   if (error) {
-//     console.log("Error server:" + error);
-//   } else {
-//     console.log("Server is listening on port" + port);
-//   }
-// });
 
 module.exports = server;

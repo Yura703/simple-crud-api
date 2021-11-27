@@ -32,7 +32,7 @@ class RepositoryPersons {
   //put
   editPerson(id, pers) {
     const index = this.checkId(id);
-    const person = this.createPerson(pers);
+    const person = new Person(pers);
     person.id = id;
     this.arrayPerson[index] = person;
     return person;

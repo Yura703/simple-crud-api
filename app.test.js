@@ -67,23 +67,23 @@ describe("Сценарий 1. (из задания)", () => {
       .expect(200, done);
   });
 
-  test("1.5 DELETE-запросом удаляем созданный объект по id (ожидается подтверждение успешного удаления - code 204)", function (done) {
+  test("1.5 DELETE-запросом удаляем созданный объект по id (ожидается подтверждение успешного удаления - code 204)", async function () {
     request(app)
       .delete("/person/" + id)
       .expect(204)
       .end(function (err, res) {
         if (err) throw err;
-        else done();
+        //else done();
       });
   });
 
-  test("1.6 GET-запросом пытаемся получить удаленный объект по id (ожидается ответ, что такого объекта нет)", function (done) {
+  test("1.6 GET-запросом пытаемся получить удаленный объект по id (ожидается ответ, что такого объекта нет)", async function () {
     request(app)
       .get("/person/" + id)
       .expect(function (res) {
         expect(res.text).toEqual("ID does not exist, record not found");
       })
-      .expect(404, done);
+      .expect(404);
   });
 });
 
@@ -327,22 +327,114 @@ describe("Сценарий 5. Создание, просмотр, удалени
       .expect(200, done);
   });
 
-  test("5.3 Удаляем объект", function (done) {
+  test("5.3 Удаляем объект", async function () {
     request(app)
       .delete("/person/" + id)
       .expect(204)
       .end(function (err, res) {
         if (err) throw err;
-        else done();
       });
   });
 
-  test("5.4 Проверяем, удалился ли объект", function (done) {
+  test("5.4 Проверяем, удалился ли объект", async function () {
     request(app)
       .delete("/person/" + id)
       .expect(function (res) {
         expect(res.text).toEqual("ID does not exist, record not found");
       })
-      .expect(404, done);
+      .expect(404);
+  });
+});
+
+describe("Сценарий 6. Создание двух объектов, редактирование одного из них, просмотр", () => {
+  let id = "";
+  let person = {
+    name: "yura",
+    age: 40,
+    hobbies: ["hobby10", "hobby20"],
+  };
+  let createPerson = {};
+
+  test("6.1 Проверяем, что БД пуста (пустой массив)", function (done) {
+    request(app)
+      .get("/person")
+      .set("Accept", "application/json")
+      .expect(function (res) {
+        expect(JSON.parse(res.text)).toEqual([]);
+      })
+      .expect(200, done);
+  });
+
+  test("6.1 Создаем первый объект", function (done) {
+    request(app)
+      .post("/person")
+      .set("Accept", "application/json")
+      .send(person)
+      .expect(201)
+      .expect(function (res) {
+        createPerson = JSON.parse(res.text);
+        id = createPerson.id;
+        expect(createPerson).toEqual({
+          id: expect.any(String),
+          ...person,
+        });
+      })
+      .end(done);
+  });
+
+  test("6.2 Создаем второй объект", function (done) {
+    request(app)
+      .post("/person")
+      .set("Accept", "application/json")
+      .send(person)
+      .expect(201)
+      .expect(function (res) {
+        createPerson = JSON.parse(res.text);
+        id = createPerson.id;
+        expect(createPerson).toEqual({
+          id: expect.any(String),
+          ...person,
+        });
+      })
+      .end(done);
+  });
+
+  test("6.3 Проверяем создались ли объекты (их количество равно 2)", function (done) {
+    request(app)
+      .get("/person")
+      .set("Accept", "application/json")
+      .expect(function (res) {
+        expect(JSON.parse(res.text).length).toBe(2);
+      })
+      .expect(200, done);
+  });
+
+  test("6.4 PUT-запросом пытаемся обновить созданный объект (ожидается ответ, содержащий обновленный объект с тем же id)", function (done) {
+    const personEdit = {
+      name: "vasia",
+      age: 30,
+      hobbies: ["hobby5", "hobby6"],
+    };
+
+    request(app)
+      .put("/person/" + id)
+      .send(personEdit)
+      .expect(function (res) {
+        expect(JSON.parse(res.text)).toEqual({
+          id: expect.any(String),
+          ...personEdit,
+        });
+      })
+      .expect(200, done);
+  });
+
+  test("6.5 Проверяем осталось ли количество объектов прежним (равно 2)", function (done) {
+    request(app)
+      .get("/person")
+      .set("Accept", "application/json")
+      .expect(function (res) {
+        expect(JSON.parse(res.text).length).toBe(2);
+      })
+      .expect(200, done);
   });
 });
