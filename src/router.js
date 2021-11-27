@@ -1,6 +1,6 @@
 const fs = require("fs");
 const RepositoryPersons = require("./RepositoryPersons");
-const { NotFoundRecordError } = require("./error/errors");
+const { NotFoundRecordError, CreatePersonError } = require("./error/errors");
 
 async function get(url, response) {
   try {
@@ -21,12 +21,17 @@ async function get(url, response) {
 async function post(request, response) {
   try {
     if (_parseURL(request.url)) {
-      throw new NotFoundRecordError(`Resource POST: ${url} does not exist`);
+      throw new NotFoundRecordError(
+        `Resource POST: ${request.url} does not exist`
+      );
     }
 
     let person = {};
     const chunks = [];
     await request.on("data", (chunk) => chunks.push(chunk));
+    if (chunks.length == 0) {
+      throw new CreatePersonError("Object JSON is missing in the request body");
+    }
 
     person = RepositoryPersons.createPerson(JSON.parse(chunks));
 
@@ -42,12 +47,17 @@ async function put(request, response) {
     const id = _parseURL(request.url);
 
     if (!id) {
-      throw new NotFoundRecordError(`Resource PUT: ${url} does not exist`);
+      throw new NotFoundRecordError(
+        `Resource PUT: ${request.url} does not exist`
+      );
     }
 
     let person = {};
     const chunks = [];
     await request.on("data", (chunk) => chunks.push(chunk));
+    if (chunks.length == 0) {
+      throw new CreatePersonError("Object JSON is missing in the request body");
+    }
 
     person = RepositoryPersons.editPerson(id, JSON.parse(chunks));
 
