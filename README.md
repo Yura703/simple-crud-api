@@ -5,10 +5,14 @@ ___________________________
 ## Details:
 __________________________
 **1. Persons** are stored as `objects` that have following properties:
-    * `id` — unique identifier (`string`, `uuid`) generated on server side
-    * `name` — person's name (`string`, **required**)
-    * `age` — person's age (`number`, **required**)
-    * `hobbies` — person's hobbies (`array` of `strings` or empty `array`, **required**)
+
+     `id` — unique identifier (`string`, `uuid`) generated on server side
+  
+     `name` — person's name (`string`, **required**)
+  
+     `age` — person's age (`number`, **required**)
+  
+     `hobbies` — person's hobbies (`array` of `strings` or empty `array`, **required**)
 
 ```  
 for example:
@@ -25,7 +29,7 @@ for example:
 **3.** The application has 2 modes of running application: **development** and **production**        
         **```npm run start:dev ```**
         **```npm run start:prod```**
-        
+
 **4.** There are **E2E** tests covering the logic of the application (Jest + Supertest). 
         **```npm run test```**
 ___________________________
