@@ -29,11 +29,17 @@ async function post(request, response) {
     let person = {};
     const chunks = [];
     await request.on("data", (chunk) => chunks.push(chunk));
+
     if (chunks.length == 0) {
       throw new CreatePersonError("Object JSON is missing in the request body");
     }
+    try {
+      reqBody = JSON.parse(chunks);
+    } catch (error) {
+      throw new CreatePersonError("Invalid JSON object passed");
+    }
 
-    person = RepositoryPersons.createPerson(JSON.parse(chunks));
+    person = RepositoryPersons.createPerson(reqBody);
 
     response.statusCode = 201;
     response.end(JSON.stringify(person));
@@ -55,8 +61,14 @@ async function put(request, response) {
     let person = {};
     const chunks = [];
     await request.on("data", (chunk) => chunks.push(chunk));
+
     if (chunks.length == 0) {
       throw new CreatePersonError("Object JSON is missing in the request body");
+    }
+    try {
+      reqBody = JSON.parse(chunks);
+    } catch (error) {
+      throw new CreatePersonError("Invalid JSON object passed");
     }
 
     person = RepositoryPersons.editPerson(id, JSON.parse(chunks));

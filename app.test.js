@@ -246,7 +246,7 @@ describe("Сценарий 4. Генерация статус кодов и со
       .expect(404, done);
   });
 
-  test("4.5 PUT Сервер возвращает статус код 400 и соответствующее сообщение, если personId невалиден (не uuid)", function (done) {
+  test("4.4 PUT Сервер возвращает статус код 400 и соответствующее сообщение, если personId невалиден (не uuid)", function (done) {
     const personEdit = {
       name: "she",
       age: 40,
@@ -263,7 +263,7 @@ describe("Сценарий 4. Генерация статус кодов и со
       .expect(400, done);
   });
 
-  test("4.6 PUT Сервер возвращает статус код 404 и соответствующее сообщение, если запись с id === personId не найдена", function (done) {
+  test("4.5 PUT Сервер возвращает статус код 404 и соответствующее сообщение, если запись с id === personId не найдена", function (done) {
     const personEdit = {
       name: "she",
       age: 40,
@@ -280,7 +280,7 @@ describe("Сценарий 4. Генерация статус кодов и со
       .expect(404, done);
   });
 
-  test("4.7 DELETE Сервер возвращает статус код 400 и соответствующее сообщение, если personId невалиден (не uuid)", function (done) {
+  test("4.6 DELETE Сервер возвращает статус код 400 и соответствующее сообщение, если personId невалиден (не uuid)", function (done) {
     request(app)
       .delete("/person/12345")
       .set("Accept", "application/json")
@@ -317,14 +317,14 @@ describe("Сценарий 5. Создание, просмотр, удалени
       .end(done);
   });
 
-  test("5.2 Проверяем создался ли объект", function (done) {
-    request(app)
+  test("5.2 Проверяем создался ли объект", async function () {
+    await request(app)
       .get("/person/" + id)
       .set("Accept", "application/json")
       .expect(function (res) {
         expect(JSON.parse(res.text)).toEqual(createPerson);
       })
-      .expect(200, done);
+      .expect(200);
   });
 
   test("5.3 Удаляем объект", async function () {
@@ -354,16 +354,6 @@ describe("Сценарий 6. Создание двух объектов, ред
     hobbies: ["hobby10", "hobby20"],
   };
   let createPerson = {};
-
-  test("6.1 Проверяем, что БД пуста (пустой массив)", function (done) {
-    request(app)
-      .get("/person")
-      .set("Accept", "application/json")
-      .expect(function (res) {
-        expect(JSON.parse(res.text)).toEqual([]);
-      })
-      .expect(200, done);
-  });
 
   test("6.1 Создаем первый объект", function (done) {
     request(app)
